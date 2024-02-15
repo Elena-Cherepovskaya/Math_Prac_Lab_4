@@ -17,7 +17,6 @@ enum status_codes
     fsc_file_is_not_found,
     fsc_vector_is_not_found,
     fsc_syntax_error,
-    fsc_is_detected,
     fsc_is_not_detected,
     fsc_semantic_error,
     fsc_runtime_error,

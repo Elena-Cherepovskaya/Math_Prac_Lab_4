@@ -130,7 +130,7 @@ enum status_codes is_vector_in_storage(T_vector_storage* storage, char name)
     for (int i = 0; i < storage->len; ++i)
     {
         if ((storage->data)[i]->name == name)
-            return fsc_is_detected;
+            return fsc_ok;
     }
     return fsc_is_not_detected;
 }
@@ -138,7 +138,7 @@ enum status_codes is_vector_in_storage(T_vector_storage* storage, char name)
 enum status_codes print_vector_storage(T_vector_storage* storage, FILE* output)
 {
     if (output == NULL || storage == NULL)
-        return fsc_is_detected;
+        return fsc_invalid_parameter;
     
     for (int i = 0; i < storage->len; ++i)
         fprintf(output, "%c %d\n", (storage->data)[i]->name, (storage->data)[i]->data->data);
@@ -146,7 +146,7 @@ enum status_codes print_vector_storage(T_vector_storage* storage, FILE* output)
     return fsc_ok;
 }
 
-enum status_codes get_vector(T_vector_storage* storage, char name, T_vector_name** vector_name)
+enum status_codes vector_storage_get_vector(T_vector_storage* storage, char name, T_vector_name** vector_name)
 {
     if ((storage == NULL) || (*vector_name != NULL))
         return fsc_invalid_parameter;
@@ -155,16 +155,45 @@ enum status_codes get_vector(T_vector_storage* storage, char name, T_vector_name
     {
         if ((storage->data)[i]->name == name)
         {
-            *vector_name = (T_vector_name*)malloc(sizeof(T_vector_name));
-            if (*vector_name == NULL)
-                return fsc_invalid_parameter;
-            
-            (*vector_name)->name = name;
-            (*vector_name)->data = (storage->data)[i]->data;
-            
-            return fsc_is_detected;
+            *vector_name = (storage->data)[i];
+            return fsc_ok;
         }
     }
     
     return fsc_is_not_detected;
+}
+
+enum status_codes vector_storage_set_vector(T_vector_storage* storage, char name, int value)
+{
+    if (storage == NULL)
+        return fsc_invalid_parameter;
+    
+    for (int i = 0; i < storage->len; ++i)
+    {
+        if (storage->data[i]->name == name)
+        {
+            storage->data[i]->data->data = value;
+            return fsc_ok;
+        }
+    }
+    
+    T_vector_name* vector_name = NULL;
+    enum status_codes res = create_vector_name(&vector_name, name, value);
+    
+    if (res == fsc_ok)
+        return add_to_vector_starage(&storage, vector_name);
+    else
+        return res;
+}
+
+enum status_codes free_vector_storage (T_vector_storage** storage)
+{
+    if (*storage == NULL)
+        return fsc_invalid_parameter;
+    
+    free((*storage)->data);
+    free(*storage);
+    *storage = NULL;
+    
+    return fsc_ok;
 }

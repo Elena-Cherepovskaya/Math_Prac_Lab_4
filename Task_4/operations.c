@@ -10,61 +10,58 @@
 #include "vector_name.h"
 #include "transform_x_to_10.h"
 #include "status_codes.h"
+#include "custom_string.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 int operation_num (char* c)
 {
-    char* operation_list[] = {"+", "&", "->", "<-", "~", "<>", "+>", "?", "!"};
+    char* operation_list[] = {"+", "&", "->", "<-", "~", "<>", "+>", "?", "!", "\\"};
     
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 10; ++i)
         if (strcmp(operation_list[i], c) == 0)
             return i;
-    return 9;
+    return 10;
 }
 
-enum status_codes cacalculate(T_vector** res, char* operator, T_vector* a, T_vector* b)
+enum status_codes calculate(T_vector_name* res, T_string* operator, T_vector_name* a, T_vector_name* b)
 {
-    if (*res != NULL || a == NULL || b == NULL)
-        return fsc_invalid_parameter;
-    
-    *res = (T_vector*)malloc(sizeof(T_vector));
-    if (*res == NULL)
-        return fsc_memory_error_detected;
-    
-    int num = operation_num(operator);
+    int num = operation_num(operator->data);
     switch (num)
     {
         case 0:
-            (*res)->data = a->data | b->data;
+            res->data->data = a->data->data | b->data->data;
             break;
         case 1:
-            (*res)->data = a->data & b->data;
+            res->data->data = a->data->data & b->data->data;
             break;
         //-> - оператор логической импликации
         case 2:
-            (*res)->data = a->data <= b->data;
+            res->data->data = a->data->data <= b->data->data;
             break;
         // <-
         case 3:
-            (*res)->data = !(a->data <= b->data);
+            res->data->data = !(a->data->data <= b->data->data);
             break;
         case 4:
-            (*res)->data = a->data == b->data;
+            res->data->data = a->data->data == b->data->data;
             break;
         case 5:
-            (*res)->data = (a->data == 1) ^ (b->data == 0);
+            res->data->data = (a->data->data == 1) ^ (b->data->data == 0);
             break;
         // +>
         case 6:
-            (*res)->data = (a->data == 1) && (b->data == 0);
+            res->data->data = (a->data->data == 1) & (b->data->data == 0);
             break;
         case 7:
-            (*res)->data = !((a->data == 1) && (b->data == 1));
+            res->data->data = !((a->data->data == 1) & (b->data->data == 1));
             break;
         case 8:
-            (*res)->data = ((a->data == 0) && (b->data == 0));
+            res->data->data = ((a->data->data == 0) & (b->data->data == 0));
+            break;
+        case 9:
+            res->data->data = ~(b->data->data);
             break;
         default:
             break;
@@ -105,4 +102,16 @@ int calculate_values(int operator_num, int a, int b)
             break;
     }
     return 0;
+}
+
+bool is_operator(char c)
+{
+    char* list = "+&-><~?!\\";
+    int l = (int)strlen(list);
+    
+    for (int i = 0; i < l; ++i)
+        if (c == list[i])
+            return true;
+    
+    return false;
 }

@@ -11,9 +11,12 @@
 #include <stdio.h>
 
 #include "bool_vector.h"
+#include "vector_name.h"
+#include "custom_string.h"
 
 int operation_num (char* c);
-enum status_codes cacalculate(T_vector** res, char* operator, T_vector* a, T_vector* b);
+enum status_codes calculate(T_vector_name* res, T_string* operator, T_vector_name* a, T_vector_name* b);
 int calculate_values(int operator_num, int a, int b);
+bool is_operator(char c);
 
 #endif /* operations_h */

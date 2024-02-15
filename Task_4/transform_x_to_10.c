@@ -22,7 +22,7 @@ int char_to_num(char c)
 
 enum status_codes transform_x_to_10(int* res, char* num, int base)
 {
-    if (*res != 0 || num == NULL)
+    if (*res != 0 || num == NULL || base < 2 || base > 36)
         return fsc_invalid_parameter;
     
     int len = (int)strlen(num);
@@ -33,7 +33,7 @@ enum status_codes transform_x_to_10(int* res, char* num, int base)
         int tmp = char_to_num(*p_num);
         
         if (tmp >= base)
-            return fsc_runtime_error;
+            return fsc_invalid_parameter;
         
         *res += (tmp * pow(base, cur_pow));
         --len;
@@ -55,7 +55,7 @@ enum status_codes transform_10_to_x (char** res, int n, int base)
         return fsc_invalid_parameter;
     
     if ((base < 2) || (base > 36))
-        return fsc_runtime_error;
+        return fsc_invalid_parameter;
     
     if (n == 0)
     {
